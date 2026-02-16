@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project
+_backup*/
+*.bak
+models/distilgpt2_jazz_final/*.bin
+models/distilgpt2_jazz_final/*.safetensors
+
+# Jupyter
+.ipynb_checkpoints/

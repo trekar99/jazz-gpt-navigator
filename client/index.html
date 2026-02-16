@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonabe - Jazz GPT Navigator</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <!-- Three.js -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three":          "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/":  "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- 3-D canvas -->
+    <div id="three-canvas"></div>
+
+    <!-- ─── Branding ─────────────────────────────────────────────────── -->
+    <header id="header">
+        <div class="brand">
+            <h1>Sonabe</h1>
+            <span class="badge">GPT</span>
+            <div class="header-icons">
+                <button id="btn-info" class="header-icon" title="Info & shortcuts [H]" aria-label="Info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                </button>
+                <a href="https://github.com/upf-smc-genai-music/final-project-generative-music-tool-sonabe" target="_blank" rel="noopener" class="header-icon" title="GitHub repository" aria-label="GitHub">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                </a>
+            </div>
+        </div>
+        <p class="subtitle">Tonal Torus · AI Jazz Harmony Navigator</p>
+    </header>
+
+    <!-- ─── Info Panel ───────────────────────────────────────────────── -->
+    <div id="info-overlay" class="info-overlay">
+        <div id="info-panel" class="glass info-panel">
+            <button id="btn-close-info" class="info-close">&times;</button>
+            <h2 class="info-title">Sonabe</h2>
+            <p class="info-desc">AI-powered jazz harmony navigator on a 3-D Tonal Torus.<br>A fine-tuned DistilGPT-2 generates chord progressions in real-time.</p>
+
+            <div class="info-section">
+                <h3>Modes</h3>
+                <div class="info-grid modes">
+                    <span class="info-mode-key">Generate</span><span>AI auto-generates chords continuously or step-by-step</span>
+                    <span class="info-mode-key">Loop</span><span>Loop the current progression with synchronized rhythm</span>
+                    <span class="info-mode-key">Discover</span><span>Interactive probability heatmap — click nodes to explore</span>
+                    <span class="info-mode-key">Standards</span><span>Browse and play through 4,000+ jazz standards</span>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>Keyboard</h3>
+                <div class="info-grid keys">
+                    <kbd>Space</kbd><span>Start / Stop</span>
+                    <kbd>A</kbd><span>Step (next chord)</span>
+                    <kbd>R</kbd><span>Reset</span>
+                    <kbd>M</kbd><span>Mute</span>
+                    <kbd>← →</kbd><span>Temperature ±</span>
+                    <kbd>T</kbd><span>Temp → 0.9</span>
+                    <kbd>L</kbd><span>Loop</span>
+                    <kbd>P</kbd><span>Preview</span>
+                    <kbd>I</kbd><span>MIDI</span>
+                    <kbd>D</kbd><span>Discover</span>
+                    <kbd>S</kbd><span>Standards</span>
+                    <kbd>Enter</kbd><span>Play standard</span>
+                    <kbd>1–5</kbd><span>Rhythm style</span>
+                    <kbd>0</kbd><span>Stop rhythm</span>
+                    <kbd>H</kbd><span>This panel</span>
+                </div>
+            </div>
+
+            <p class="info-footer">Generative Algorithms for Sound and Music · SMC, UPF</p>
+        </div>
+    </div>
+
+    <!-- ─── Active Chord HUD ─────────────────────────────────────────── -->
+    <aside id="chord-hud" class="glass">
+        <div class="hud-label">Current chord</div>
+        <div id="chord-name">—</div>
+        <div id="chord-quality"></div>
+        <div id="next-preview" class="next-preview hidden">
+            <div class="next-label">Next</div>
+            <div id="next-name">—</div>
+        </div>
+    </aside>
+
+    <!-- ─── Legend ───────────────────────────────────────────────────── -->
+    <aside id="torus-legend" class="glass">
+        <div class="legend-title">Quality axis (φ)</div>
+        <div class="legend-row"><span class="dot" style="--c:#5ea8ff"></span>Major</div>
+        <div class="legend-row"><span class="dot" style="--c:#8bd4ff"></span>Suspended</div>
+        <div class="legend-row"><span class="dot" style="--c:#ffc44d"></span>Dominant</div>
+        <div class="legend-row"><span class="dot" style="--c:#ff7849"></span>Minor</div>
+        <div class="legend-row"><span class="dot" style="--c:#c97dff"></span>Augmented</div>
+        <div class="legend-row"><span class="dot" style="--c:#ff4466"></span>Diminished</div>
+    </aside>
+
+    <!-- ─── MIDI output settings ─────────────────────────────────────── -->
+    <aside id="midi-panel" class="glass">
+        <div class="legend-title">MIDI Output</div>
+        <div id="midi-status-row" class="midi-row">
+            <span class="midi-dot off" id="midi-dot"></span>
+            <span id="midi-port-name">Not available</span>
+        </div>
+    </aside>
+
+    <!-- ─── Progression timeline ─────────────────────────────────────── -->
+    <div id="progression-bar">
+        <div id="progression-track"></div>
+    </div>
+
+    <!-- ─── Controls ─────────────────────────────────────────────────── -->
+    <nav id="controls">
+        <!-- Primary controls — always visible -->
+        <button id="btn-start" class="ctrl-btn primary" title="Auto-play (Space)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+            Start
+        </button>
+        <button id="btn-stop" class="ctrl-btn" disabled title="Stop (Space)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+            Stop
+        </button>
+        <button id="btn-step" class="ctrl-btn" title="Next chord [A]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="4,3 16,12 4,21"/><rect x="17" y="3" width="3" height="18" rx="1"/></svg>
+            Step
+        </button>
+        <button id="btn-reset" class="ctrl-btn danger" title="Reset [R]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 105.64-12.36L1 10"/></svg>
+            Reset
+        </button>
+        <button id="btn-mute" class="ctrl-btn" title="Toggle sound [M]">
+            <svg id="icon-unmuted" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 8.5v7a4.49 4.49 0 002.5-3.5zM14 3.23v2.06a7.007 7.007 0 010 13.42v2.06A9.003 9.003 0 0014 3.23z"/></svg>
+            <svg id="icon-muted" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M16.5 12A4.5 4.5 0 0014 8.5v2.09l2.4 2.4c.07-.31.1-.64.1-.99zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0021 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 003.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+            Sound
+        </button>
+        <div id="temp-group" class="temp-group" title="Temperature [← →] · Reset [T]">
+            <label for="temp-slider" class="temp-label">Temp</label>
+            <input id="temp-slider" type="range" min="0.1" max="2.5" step="0.05" value="0.9" class="temp-slider">
+            <span id="temp-value" class="temp-value">0.9</span>
+        </div>
+
+        <!-- "More" toggle for secondary controls -->
+        <div id="more-group" class="more-group">
+            <button id="btn-more" class="ctrl-btn" title="More controls">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                <span id="more-btn-label">More</span>
+            </button>
+            <div id="more-dropdown" class="more-dropdown hidden">
+                <div class="more-dd-title">Extra controls</div>
+                <div class="more-dd-row">
+                    <button id="btn-loop" class="ctrl-btn" title="Loop current chords [L]" disabled>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+                        <span id="loop-btn-label">Loop</span>
+                    </button>
+                    <button id="btn-preview" class="ctrl-btn" title="Show next chord prediction [P]">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                        <span id="preview-btn-label">Preview</span>
+                    </button>
+                    <button id="btn-midi" class="ctrl-btn" title="Toggle MIDI output to DAW [I]">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55A4 4 0 1014 17V7h4V3h-6z"/></svg>
+                        <span id="midi-btn-label">MIDI</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <span class="ctrl-spacer"></span>
+        <div id="rhythm-group" class="rhythm-group">
+            <button id="btn-rhythm" class="ctrl-btn" title="Toggle jazz rhythm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="14" r="3"/><path d="M9 18V5l12-3v12" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                <span id="rhythm-btn-label">Rhythm</span>
+            </button>
+            <div id="rhythm-dropdown" class="rhythm-dropdown hidden">
+                <div class="rhythm-dd-title">Jazz Styles</div>
+            </div>
+        </div>
+        <button id="btn-discover" class="ctrl-btn" title="Discover chord progressions interactively [D]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <span id="discover-btn-label">Discover</span>
+        </button>
+        <button id="btn-standards" class="ctrl-btn" title="Browse jazz standards [S]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 4h2v5l-1-.75L9 9V4zm9 16H6V4h1v9l3-2.25L13 13V4h5v16z"/></svg>
+            <span id="standards-btn-label">Standards</span>
+        </button>
+    </nav>
+
+    <!-- ─── Raycasting tooltip ───────────────────────────────────────── -->
+    <div id="tooltip" role="tooltip">
+        <div id="tooltip-name"></div>
+        <div id="tooltip-quality"></div>
+    </div>
+
+    <!-- ─── Jazz Standards Browser Modal ─────────────────────────────── -->
+    <div id="standards-overlay" class="modal-overlay hidden">
+        <div id="standards-modal" class="glass modal">
+            <header class="modal-header">
+                <h2>Jazz Standards</h2>
+                <span id="standards-count" class="modal-badge">0</span>
+                <button id="btn-close-standards" class="modal-close">&times;</button>
+            </header>
+            <div class="modal-search">
+                <input type="text" id="standards-search" placeholder="Search standards…" autocomplete="off" spellcheck="false">
+            </div>
+            <ul id="standards-list" class="modal-list"></ul>
+            <footer class="modal-footer">
+                <div id="standard-info" class="standard-info"></div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ─── Standard info bar (shown when a standard is loaded) ──────── -->
+    <aside id="standard-bar" class="glass hidden">
+        <div class="standard-bar-inner">
+            <span class="standard-bar-icon">🎵</span>
+            <div class="standard-bar-text">
+                <span id="standard-bar-title">—</span>
+                <span id="standard-bar-meta"></span>
+            </div>
+            <button id="btn-play-standard" class="ctrl-btn primary" title="Play this standard [Enter]">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                Play
+            </button>
+        </div>
+    </aside>
+
+    <!-- ─── Scripts ──────────────────────────────────────────────────── -->
+    <script src="js/chord-map.js"></script>
+    <script src="js/synth.js"></script>
+    <script src="js/drums.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

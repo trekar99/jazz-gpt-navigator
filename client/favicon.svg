@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5ea8ff"/>
+      <stop offset="100%" stop-color="#b487ff"/>
+    </linearGradient>
+  </defs>
+  <!-- Torus ring (stylised) -->
+  <ellipse cx="32" cy="34" rx="26" ry="14" fill="none" stroke="url(#g)" stroke-width="3.5" opacity="0.35"/>
+  <ellipse cx="32" cy="30" rx="26" ry="14" fill="none" stroke="url(#g)" stroke-width="3.5" opacity="0.6"/>
+  <ellipse cx="32" cy="26" rx="26" ry="14" fill="none" stroke="url(#g)" stroke-width="4"/>
+  <!-- Musical note -->
+  <path d="M36 12v20a6 6 0 1 1-4-5.6V16h12v-4H36z" fill="url(#g)" opacity="0.9"/>
+  <!-- Glow dot (navigator orb) -->
+  <circle cx="50" cy="26" r="3.5" fill="#5ea8ff" opacity="0.85">
+    <animate attributeName="opacity" values="0.85;0.4;0.85" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>
