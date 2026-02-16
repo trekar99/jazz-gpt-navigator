@@ -1,8 +1,8 @@
 name: Sync to Hugging Face Hub
 on:
   push:
-    branches: [main]  # Si tu rama se llama 'master', cambia esto a 'master'
-
+    branches: [main]  
+    
   # Permite darle al botón manual si quieres forzarlo
   workflow_dispatch:
 
@@ -17,5 +17,4 @@ jobs:
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        # ¡CAMBIA LA LÍNEA DE ABAJO CON TU USUARIO Y NOMBRE DE SPACE!
-        run: git push https://trekar99:$HF_TOKEN@huggingface.co/spaces/trekar99/jazz-gpt-navigator main
+        run: git push --force https://trekar99:$HF_TOKEN@huggingface.co/spaces/trekar99/jazz-gpt-navigator main
