@@ -1,20 +1,54 @@
 name: Sync to Hugging Face Hub
 on:
   push:
-    branches: [main]  
-    
-  # Permite darle al botón manual si quieres forzarlo
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   sync-to-hub:
     runs-on: ubuntu-latest
     steps:
+      # 1. Download your clean code from GitHub
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
           lfs: true
-      - name: Push to hub
+
+      # 2. THE MAGIC TRICK: Inject Metadata locally (Runner only)
+      - name: Inject HF Metadata into README
+        run: |
+          # Define the metadata block you hate to see in GitHub
+          # IMPORTANT: Keep indentation to the left inside quotes
+          METADATA="---
+          title: Jazz GPT Navigator
+          emoji: 🎷
+          colorFrom: blue
+          colorTo: indigo
+          sdk: docker
+          pinned: false
+          app_port: 7860
+          short_description: Transformer jazz harmony navigator on a 3D Tonal Torus.
+          ---"
+
+          # Rename original README temporarily
+          mv README.md ORIGINAL_README.md
+
+          # Create new README: Metadata + Original Content
+          echo "$METADATA" > README.md
+          echo "" >> README.md
+          cat ORIGINAL_README.md >> README.md
+
+          # Configure a dummy git user for this temporary commit
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action Bot"
+
+          # Commit the change LOCALLY in the runner (This does NOT go back to GitHub)
+          git add README.md
+          git commit -m "Inject Hugging Face metadata [skip ci]"
+
+      # 3. Push the modified version to Hugging Face
+      - name: Push to Hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        # We use --force because the histories will now be different
         run: git push --force https://trekar99:$HF_TOKEN@huggingface.co/spaces/trekar99/jazz-gpt-navigator main
