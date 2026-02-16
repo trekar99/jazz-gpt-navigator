@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
     musescore \
     lilypond \
     build-essential \
-    libasound2-dev \  <-- AÑADE ESTA LÍNEA
+    libasound2-dev \  
     && rm -rf /var/lib/apt/lists/*
 
 # Python deps — install before copying code for layer caching
