@@ -23,8 +23,6 @@ Thumbs.db
 # Project
 _backup*/
 *.bak
-models/distilgpt2_jazz_final/*.bin
-models/distilgpt2_jazz_final/*.safetensors
 
 # Jupyter
 .ipynb_checkpoints/
