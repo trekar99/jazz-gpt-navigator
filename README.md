@@ -1,4 +1,15 @@
-# Sonabe — Jazz GPT Navigator
+---
+title: Jazz GPT Navigator
+emoji: 🎷
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+app_port: 7860
+short_description: Transformer jazz harmony navigator on a 3D Tonal Torus. 
+---
+
+# Sonabe | Jazz GPT Navigator
 
 **Real-time AI Jazz harmony exploration on a 3-D Tonal Torus.**
 
